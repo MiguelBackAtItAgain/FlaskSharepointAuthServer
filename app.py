@@ -1,6 +1,7 @@
 import os
 import requests
 from flask import Flask, jsonify, Response, request
+from flask_cors import CORS 
 from dotenv import load_dotenv
 from functools import wraps
 from urllib.parse import urlencode
@@ -16,6 +17,8 @@ USERNAME = os.getenv("FLASK_USERNAME")
 PASSWORD = os.getenv("PASSWORD")
 
 app = Flask(__name__)
+
+CORS(app, resources={r"/*": {"origins": "https://us-account.plumsail.com"}})
 
 def check_auth(username, password):
     return username == USERNAME and password == PASSWORD
