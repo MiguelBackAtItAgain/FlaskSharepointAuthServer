@@ -34,6 +34,9 @@ def get_access_token():
         print("Error getting token: ", response_json)
         return None
 
+@app.route('/', methods=["GET"])
+def home():
+    return jsonify({"message": "The service is live!"})
 
 @app.route('/get-courses-data', methods=['GET'])
 def get_sharepoint_data():
