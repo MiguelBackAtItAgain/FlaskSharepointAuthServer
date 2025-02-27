@@ -1,7 +1,8 @@
 import os
 import requests
-from flask import Flask, jsonify
+from flask import Flask, jsonify, Response, request
 from dotenv import load_dotenv
+from functools import wraps
 from urllib.parse import urlencode
 
 load_dotenv()
@@ -11,8 +12,26 @@ CLIENT_ID = os.getenv("CLIENT_ID")
 CLIENT_SECRET = os.getenv("CLIENT_SECRET")
 SITE_ID = os.getenv("SITE_ID")
 LIST = os.getenv("LIST")
+USERNAME = os.getenv("FLASK_USERNAME")
+PASSWORD = os.getenv("PASSWORD")
 
 app = Flask(__name__)
+
+def check_auth(username, password):
+    return username == USERNAME and password == PASSWORD
+
+def authenticate():
+    return Response('Incorrect login credentials', 401, {'WWW-Authenticate': 'Basic realm="Login Required"'})
+
+def requires_auth(f):
+    @wraps(f)
+    def validate_info(*args, **kwargs):
+        auth = request.authorization
+        if not auth or not check_auth(auth.username, auth.password):
+            return authenticate()
+        return f(*args, **kwargs)
+    return validate_info
+
 
 def get_access_token():
     token_url = f"https://login.microsoftonline.com/{TENANT_ID}/oauth2/v2.0/token"
@@ -39,6 +58,7 @@ def home():
     return jsonify({"message": "The service is live!"})
 
 @app.route('/get-courses-data', methods=['GET'])
+@requires_auth
 def get_sharepoint_data():
     
     token = get_access_token()
