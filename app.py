@@ -69,7 +69,7 @@ def get_sharepoint_data():
     if not token:
         return jsonify({"error": "Failed to get access token"}), 500
     
-    url = f"https://graph.microsoft.com/v1.0/sites/{SITE_ID}/lists/{LIST}/items?$expand=fields($select=ID,NombreCursoEstandar)"
+    url = f"https://graph.microsoft.com/v1.0/sites/{SITE_ID}/lists/{LIST}/items?$expand=fields($select=ID,NombreCursoEstandar,ContadorDiasGracia)"
 
     headers = {
         "Authorization": f"Bearer {token}",
@@ -86,7 +86,9 @@ def get_sharepoint_data():
                 "NombreCursoEstandar": item.get("fields", {}).get("NombreCursoEstandar")
             }
             for item in items
+            if item.get("fields", {}).get("ContadorDiasGracia") < 30
         ]
+        print(len(formatted_items))
         return jsonify(formatted_items)
     else:
         return jsonify({"error": "Failed to fetch SharePoint data"}), response.status_code
