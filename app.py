@@ -18,7 +18,7 @@ PASSWORD = os.getenv("PASSWORD")
 
 app = Flask(__name__)
 
-CORS(app, resources={r"/*": {"origins": "https://us-account.plumsail.com"}})
+CORS(app, resources={r"/*": {"origins": "https://siyuanprod.us.plumsail.io"}})
 
 def check_auth(username, password):
     return username == USERNAME and password == PASSWORD
